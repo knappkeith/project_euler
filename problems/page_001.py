@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 # from stopwatch import clockit as _clockit
 from lib.timer_laps import LapWatch as _LapWatch
-from number_to_string import convert_number_to_string
+from lib.number_to_string import convert_number_to_string as _convert_number_to_string
+from lib.data_converter import convert_file_to_array as _convert_file_to_array
+from lib import dates as _dates
 import sys as _sys
 
 
@@ -686,8 +688,135 @@ def problem_017(num_to=1000):
     """
     total_len = 0
     for i in range(1, num_to + 1):
-        total_len += _strip_spaces_and_dashes(convert_number_to_string(i, use_comma=False))
+        total_len += _strip_spaces_and_dashes(_convert_number_to_string(i, use_comma=False))
     return total_len
+
+
+def problem_018(file_name="/Users/keith/dev/personal/project_euler/problems/data/problem_018_data.txt"):
+    """
+    By starting at the top of the triangle below and moving to
+    adjacent numbers on the row below, the maximum total from
+    top to bottom is 23.
+
+       3
+      7 4
+     2 4 6
+    8 5 9 3
+
+    That is, 3 + 7 + 4 + 9 = 23.
+
+    Find the maximum total from top to bottom of the triangle below:
+
+                                75
+                              95 64
+                            17 47 82
+                          18 35 87 10
+                        20 04 82 47 65
+                      19 01 23 75 03 34
+                    88 02 77 73 07 63 67
+                  99 65 04 28 06 16 70 92
+                41 41 26 56 83 40 80 70 33
+              41 48 72 33 47 32 37 16 94 29
+            53 71 44 65 25 43 91 52 97 51 14
+          70 11 33 28 77 73 17 78 39 68 17 57
+        91 71 52 38 17 14 91 43 58 50 27 29 48
+      63 66 04 68 89 53 67 30 73 16 69 87 40 31
+    04 62 98 27 23 09 70 98 73 93 38 53 60 04 23
+
+    NOTE: As there are only 16384 routes, it is possible to
+    solve this problem by trying every route. However, Problem 67,
+    is the same challenge with a triangle containing one-hundred
+    rows; it cannot be solved by brute force, and requires a
+    clever method! ;o)
+    """
+
+    nodes = _convert_file_to_array(file_name)
+    # nodes = [
+    # [75],
+    # [95, 64],
+    # [17, 47, 82],
+    # [18, 35, 87, 10],
+    # [20, 4, 82, 47, 65],
+    # [19, 1, 23, 75, 3, 34],
+    # [88, 2, 77, 73, 07, 63, 67],
+    # [99, 65, 4, 28, 6, 16, 70, 92],
+    # [41, 41, 26, 56, 83, 40, 80, 70, 33],
+    # [41, 48, 72, 33, 47, 32, 37, 16, 94, 29],
+    # [53, 71, 44, 65, 25, 43, 91, 52, 97, 51, 14],
+    # [70, 11, 33, 28, 77, 73, 17, 78, 39, 68, 17, 57],
+    # [91, 71, 52, 38, 17, 14, 91, 43, 58, 50, 27, 29, 48],
+    # [63, 66, 4, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31],
+    # [4, 62, 98, 27, 23, 9, 70, 98, 73, 93, 38, 53, 60, 04, 23]]
+
+    nodes.reverse()
+
+    for i in range(0, len(nodes) - 1):
+        bot_arr = nodes[i]
+        top_arr = nodes[i + 1]
+        new_top = []
+        for j in range(0, len(top_arr)):
+            if top_arr[j] + bot_arr[j] > top_arr[j] + bot_arr[j + 1]:
+                new_top.append(top_arr[j] + bot_arr[j])
+            else:
+                new_top.append(top_arr[j] + bot_arr[j + 1])
+        nodes[i + 1] = new_top
+    return nodes[-1][0]
+
+
+def problem_067(file_name="/Users/keith/dev/personal/project_euler/problems/data/problem_067_data.txt"):
+    return problem_018(file_name=file_name)
+
+def problem_019():
+    """
+    You are given the following information, but you may
+    prefer to do some research for yourself.
+
+    1. 1 Jan 1900 was a Monday.
+    2. Thirty days has September, April, June and November.
+       All the rest have thirty-one, Saving February alone,
+       Which has twenty-eight, rain or shine. And on leap years,
+       twenty-nine.
+    3. A leap year occurs on any year evenly divisible by 4,
+       but not on a century unless it is divisible by 400.
+    
+    How many Sundays fell on the first of the month during
+    the twentieth century (1 Jan 1901 to 31 Dec 2000)?
+    """
+    pre_total = 365
+    all_months = []
+    for year in range(1901, 2001):
+        for month in range(1, 13):
+            this_month = _dates.days_in_month(month, year)
+            all_months.append(pre_total)
+            pre_total += this_month
+    week_days = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"]
+    week_days = week_days * ((366 * 101) / 7)
+    day_cnt = 0
+    for i in all_months:
+        if week_days[i] == "Sunday": 
+            day_cnt += 1 
+    return day_cnt
+
+def problem_020(factorial_of=100):
+    """
+    n! means n × (n − 1) × ... × 3 × 2 × 1
+
+    For example, 10! = 10 × 9 × ... × 3 × 2 × 1 = 3628800,
+    and the sum of the digits in the number 10! is 3 + 6 + 2 + 8 + 8 + 0 + 0 = 27.
+
+    Find the sum of the digits in the number 100!
+    """
+    total_prod = 1
+    for i in range(1, factorial_of + 1):
+        total_prod = total_prod * i
+    return sum([int(x) for x in str(total_prod)])
 
 
 def _strip_spaces_and_dashes(num_str):
