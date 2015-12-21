@@ -804,12 +804,14 @@ def problem_019():
             day_cnt += 1 
     return day_cnt
 
+
 def problem_020(factorial_of=100):
     """
     n! means n × (n − 1) × ... × 3 × 2 × 1
 
     For example, 10! = 10 × 9 × ... × 3 × 2 × 1 = 3628800,
-    and the sum of the digits in the number 10! is 3 + 6 + 2 + 8 + 8 + 0 + 0 = 27.
+    and the sum of the digits in the number 10!
+    is 3 + 6 + 2 + 8 + 8 + 0 + 0 = 27.
 
     Find the sum of the digits in the number 100!
     """
@@ -817,6 +819,33 @@ def problem_020(factorial_of=100):
     for i in range(1, factorial_of + 1):
         total_prod = total_prod * i
     return sum([int(x) for x in str(total_prod)])
+
+def problem_021(amicable_below=10000):
+    """
+    Let d(n) be defined as the sum of proper divisors
+    of n (numbers less than n which divide evenly into n).
+    If d(a) = b and d(b) = a, where a ≠ b,
+    then a and b are an amicable pair and each of
+    a and b are called amicable numbers.
+
+    For example, the proper divisors of 220 are
+    1, 2, 4, 5, 10, 11, 20, 22, 44, 55 and 110;
+    therefore d(220) = 284. The proper divisors of
+    284 are 1, 2, 4, 71 and 142; so d(284) = 220.
+
+    Evaluate the sum of all the amicable numbers under 10000.
+    """
+    amicable_nums = []
+    for i in range(1, amicable_below + 1):
+        if i not in amicable_nums:
+            i_factors = _get_factors_proper(i)
+            i_prime = sum(i_factors)
+            i_prime_factors = _get_factors_proper(i_prime)
+            i_prime_factors_prime = sum(i_prime_factors)
+            if i_prime_factors_prime == i and i != i_prime:
+                amicable_nums.append(i)
+                amicable_nums.append(i_prime)
+    return sum(amicable_nums)
 
 
 def _strip_spaces_and_dashes(num_str):
@@ -873,6 +902,16 @@ def _get_factors(num):
             if i == div:
                 break
     return factors
+
+def _get_factors_proper(num):
+    factors = _get_factors(num)
+    a = [x[0] for x in factors]
+    if factors[-1][0] == factors[-1][1]:
+        a += [x[1] for x in factors[1:-1]]
+    else:
+        a += [x[1] for x in factors[1:]]
+    # a += [x[1] for x in factors[1:]]
+    return a
 
 
 def _get_number_of_factors(num):
