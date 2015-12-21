@@ -1,8 +1,11 @@
 
-def convert_file_to_array(file_name):
+def convert_file_to_array(file_name, convert_int=True, **kwargs):
     with open(file_name, "r") as data_file:
         data = data_file.read()
-    return convert_to_int(parse_data(data))
+    if convert_int:
+        return convert_to_int(parse_data(data, **kwargs))
+    else:
+        return parse_data(data, **kwargs)
 
 
 def _get_data_from_file(file_name):
@@ -17,11 +20,12 @@ def parse_data(str_data, delim_1="\n", delim_2=" "):
         a.remove("")
     except:
         pass
-    b = []
-    for i in a:
-        b.append(i.split(delim_2))
-    return b
-
+    if delim_2 != "":
+        b = []
+        for i in a:
+            b.append(i.split(delim_2))
+        return b
+    return a
 
 
 def convert_to_int(data_array):
