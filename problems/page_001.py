@@ -877,6 +877,63 @@ def problem_022(file_name="/Users/keith/dev/personal/project_euler/problems/data
     return overall_sum
 
 
+def problem_023(max_num=28123):
+    """
+    A perfect number is a number for which the sum of its proper divisors is
+    exactly equal to the number. For example, the sum of the proper divisors of
+    28 would be 1 + 2 + 4 + 7 + 14 = 28, which means that 28 is a perfect number.
+
+    A number n is called deficient if the sum of its proper divisors is
+    less than n and it is called abundant if this sum exceeds n.
+
+    As 12 is the smallest abundant number, 1 + 2 + 3 + 4 + 6 = 16,
+    the smallest number that can be written as the sum of two abundant
+    numbers is 24. By mathematical analysis, it can be shown that
+    all integers greater than 28123 can be written as the sum of two
+    abundant numbers. However, this upper limit cannot be reduced any
+    further by analysis even though it is known that the greatest number
+    that cannot be expressed as the sum of two abundant numbers is less
+    than this limit.
+
+    Find the sum of all the positive integers which cannot be written as
+    the sum of two abundant numbers.
+    """
+    abundant_nums = []
+    for i in range(1, max_num + 1):
+        if _is_abundant(i):
+            abundant_nums.append(i)
+            # if _is_odd(i):
+            #     print i 
+
+    # print abundant_nums
+    sum_not_abundant = 0
+    for i in range(1, max_num + 1):
+        is_a_sum_of_two = False
+        for j in abundant_nums:
+            if i - j <= 11:
+                break
+            if i - j in abundant_nums:
+                is_a_sum_of_two = True
+                break
+        if not is_a_sum_of_two:
+            # print i
+            sum_not_abundant += i
+
+    return sum_not_abundant
+
+
+def problem_025(num_digits=1000):
+    a = _build_fib(1 * (10 ** (num_digits - 1)))
+    return len(a) + 1
+
+
+def _is_abundant(num):
+    if sum(_get_factors_proper(num)) > num:
+        return True
+    else:
+        return False
+
+
 def _get_name_value(name):
     alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     return sum([alpha.index(x) for x in name], len(name))
@@ -964,7 +1021,7 @@ def _drange(start, stop, step=1):
 
 
 def _build_fib(max_num):
-    fib = [1, 2]
+    fib = [1, 1]
     while fib[-1] < max_num:
         fib.append(fib[-1] + fib[-2])
     return fib[0:-1]
@@ -1043,3 +1100,15 @@ if __name__ == "__main__":
                     print "{:14}: {:13} in {} sec".format(i, item(), times.lap(i))
                     times.lap(i)
     print "\n{:14}: {} sec".format("Total Time", times.elapsed)
+
+def _permute(xs, low=0):
+    if low + 1 >= len(xs):
+        yield xs
+    else:
+        for p in _permute(xs, low + 1):
+            yield p        
+        for i in range(low + 1, len(xs)):        
+            xs[low], xs[i] = xs[i], xs[low]
+            for p in _permute(xs, low + 1):
+                yield p        
+            xs[low], xs[i] = xs[i], xs[low]
